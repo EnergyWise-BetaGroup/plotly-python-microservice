@@ -1,0 +1,12 @@
+dash==2.18.2
+dash-core-components==2.0.0
+dash-html-components==2.0.0
+dash-table==5.0.0
+Flask==3.0.3
+jupyter_client==8.6.3
+jupyter_core==5.7.2
+matplotlib-inline==0.1.7
+numpy==1.26.4
+pandas==2.2.3
+plotly==6.0.0
+
