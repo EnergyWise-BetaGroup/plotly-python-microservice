@@ -13,9 +13,6 @@ def generate_visualisation():
 
     data = request.json
 
-    print(data)
-
-
     meter_data = data['data']['meter']
     intensity_data = data['data']['intensity']
 
