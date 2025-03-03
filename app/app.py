@@ -52,7 +52,7 @@ def generate_style_visualisation():
    
     data = request.json
 
-    energy_data = data['energySourcesData']
+    energy_data = data
 
     df_energy = pd.DataFrame(energy_data)
 
