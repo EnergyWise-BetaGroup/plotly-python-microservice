@@ -1,6 +1,6 @@
 const mountPoint = document.getElementById("mount-point")
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpc3RyYXRpb25faWQiOjEsImlhdCI6MTc0MDk5MzE4OCwiZXhwIjoxNzQwOTk2Nzg4fQ.1tWywb6gdRGafumKMrGpMUfjGR6Ekg1TBMYuunLfDRA"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpc3RyYXRpb25faWQiOjEsImlhdCI6MTc0MTAxMzgxNywiZXhwIjoxNzQxMDE3NDE3fQ.PqdVrH-yHeiUWQcQ_UtW0ISGvVoUEbG003zBe_rI1Wg"
 
 function mountChart(htmlData) {
     mountPoint.innerHTML = htmlData
