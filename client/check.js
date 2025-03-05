@@ -31,6 +31,7 @@ function fetchAllCharts() {
     fetchChart("line-graph", lineMountPoint)
     fetchChart("donut", donutMountPoint)
     fetchChart("table", donutMountPoint)
+    fetchChart("gauge", lineMountPoint)
 }
  
 window.addEventListener("DOMContentLoaded", fetchAllCharts)
