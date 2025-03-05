@@ -174,94 +174,128 @@ def generate_table_visualisation():
 
 
 
-# @app.route("/generate-gauge-visualisation", methods=["POST"])
-# def generate_style_visualisation():
+@app.route("/generate-gauge-visualisation", methods=["POST"])
+def generate_style_visualisation():
+    data_dict = json.loads(json_data)
 
-#     # gauge charts
-#     last_day = data['Datetime (UTC)'].max().normalize()
-#     previous_day = last_day - pd.Timedelta(days=1) 
-#     last_day_emissions = data[data['Datetime (UTC)'].dt.normalize() == last_day]['CO2 Emissions'].sum()
-#     previous_day_emissions = data[data['Datetime (UTC)'].dt.normalize() == previous_day]['CO2 Emissions'].sum()
-    
-#     if previous_day_emissions > 0:
-#         percentage_increase = ((last_day_emissions - previous_day_emissions) / previous_day_emissions) * 100
-#     else:
-#         percentage_increase = 100 if last_day_emissions > 0 else 0
-    
-#     fig = go.Figure(go.Indicator(
-#         mode="gauge+number",
-#         value=percentage_increase,
-#         title={'text': "Percentage Difference in CO2 Emissions from Previous Day"},
-#         gauge={
-#             'axis': {'range': [-100, 100]},
-#             'bar': {'color': "darkblue"},
-#             'steps': [
-#                 {'range': [-100, 0], 'color': "green"},   
-#                 {'range': [0, 20], 'color': "yellow"},   
-#                 {'range': [20, 100], 'color': "red"}     
-#             ],
-#         }
-#     ))
-    
-#     fig.show()
- 
- 
-#     start_of_last_week = pd.to_datetime("2025-02-17")
-#     end_of_last_week = pd.to_datetime("2025-02-23")
-    
-#     start_of_previous_week = pd.to_datetime("2025-02-10")
-#     end_of_previous_week = pd.to_datetime("2025-02-16")
-    
-#     last_week_emissions = data[(data['Datetime (UTC)'] >= start_of_last_week) & (data['Datetime (UTC)'] <= end_of_last_week)]['CO2 Emissions'].sum()
-    
-    
-#     previous_week_emissions = data[(data['Datetime (UTC)'] >= start_of_previous_week) & (data['Datetime (UTC)'] <= end_of_previous_week)]['CO2 Emissions'].sum()
-    
-    
-#     if previous_week_emissions > 0:  
-#         percentage_change = ((last_week_emissions - previous_week_emissions) / previous_week_emissions) * 100
-#     else:
-#         percentage_change = 100 if last_week_emissions > 0 else 0
-    
-#     colors = ["#78c6a3", "white", "red"]
-#     # Create a color scale
-#     color_scale = [[0, colors[0]], [0.5, colors[1]], [1, colors[2]]]
-    
-#     fig = go.Figure(go.Indicator(
-#         mode="gauge+number+delta",
-#         value=percentage_change,
-#         title={'text': "Percentage Change in CO2 Emissions (Last Week vs Previous Week)"},
-#         gauge={
-#             'axis': {'range': [-100, 100]},  # Range from -100% to 100%
-#             'bar': {'color': "darkblue"},
-#             'steps': [
-#                 {'range': [-100, 0], 'color': "#78c6a3"},   # Good: light green
-#                 {'range': [0, 10], 'color': "#a8e1c6"},     # Blend to a lighter green
-#                 {'range': [10, 20], 'color': "white"},       # Neutral: white
-#                 {'range': [20, 30], 'color': "#f6e6e6"},     # Blend to a light pink
-#                 {'range': [30, 100], 'color': "red"}         # Bad: red
-#             ],
-#             'threshold': {
-#                 'line': {'color': "black", 'width': 4},  # Pointer line color and width
-#                 'thickness': 0.75,
-#                 'value': percentage_change,  # Position of the pointer
-#             },
-#         },
-#         number={'valueformat': ".0f", 'suffix': "%"}  # Add percentage sign next to the value
-#     ))
-    
-#     fig.update_layout(
-#             paper_bgcolor='rgba(0,0,0,0)',
-#             plot_bgcolor='rgba(0,0,0,0)'
-#         )
+    # Convert the meter data to a DataFrame
+    meter_data = data_dict["data"]["meter"]
+    df_meter = pd.DataFrame(meter_data)
+
+    # Convert the intensity data to a DataFrame
+    intensity_data = data_dict["data"]["intensity"]
+    df_intensity = pd.DataFrame(intensity_data)
+
+    # Merge the meter and intensity data on the 'start_datetime' column
+    df = pd.merge(df_meter[['datapoint', 'start_datetime']], df_intensity[['datapoint', 'start_datetime']], on='start_datetime', suffixes=('_meter', '_intensity'))
+
+    # Calculate CO2 emissions by multiplying meter datapoint and intensity datapoint
+    df['CO2_Emissions'] = df['datapoint_meter'] * df['datapoint_intensity']
+
+    # Convert the 'start_datetime' to datetime format
+    df['Datetime (UTC)'] = pd.to_datetime(df['start_datetime'])
+
+    # Extract the date part to group by day
+    df['Date'] = df['Datetime (UTC)'].dt.date
+
+    # Sum the emissions for each day
+    daily_emissions = df.groupby('Date')['CO2_Emissions'].sum().reset_index()
+
+    # Print the final results
+    print(daily_emissions)
+
+    # Print last and previous day for reference
+    last_day = pd.to_datetime(daily_emissions['Date']).max().normalize()
+    previous_day = last_day - pd.Timedelta(days=1)
+
+    last_day_emissions = daily_emissions[daily_emissions['Date'] == last_day.date()]['CO2_Emissions'].sum()
+    previous_day_emissions = daily_emissions[daily_emissions['Date'] == previous_day.date()]['CO2_Emissions'].sum()
+
+    if previous_day_emissions > 0:
+        percentage_increase = ((last_day_emissions - previous_day_emissions) / previous_day_emissions) * 100
+    else:
+        percentage_increase = 100 if last_day_emissions > 0 else 0 
+
+    print(percentage_increase)
+
+    fig_guage_day = go.Figure(go.Indicator(
+        mode="gauge+number+delta",
+        value=percentage_increase,
+        title={'text': "Percentage Change in CO2 Emissions (Last Week vs Previous Week)"},
+        gauge={
+            'axis': {'range': [-100, 100]},  # Range from -100% to 100%
+            'bar': {'color': "darkblue"},
+            'steps': [
+                {'range': [-100, 0], 'color': "#78c6a3"},   # Good: light green
+                {'range': [0, 10], 'color': "#a8e1c6"},     # Blend to a lighter green
+                {'range': [10, 20], 'color': "white"},       # Neutral: white
+                {'range': [20, 30], 'color': "#f6e6e6"},     # Blend to a light pink
+                {'range': [30, 100], 'color': "red"}         # Bad: red
+            ],
+            'threshold': {
+                'line': {'color': "black", 'width': 4},  # Pointer line color and width
+                'thickness': 0.75,
+                'value': percentage_increase,  # Position of the pointer
+            },
+        },
+        number={'valueformat': ".0f", 'suffix': "%"}  # Add percentage sign next to the value
+    ))
+
+    fig_guage_day.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+    )
+
+    last_7_days = daily_emissions.iloc[-7:]["CO2_Emissions"]
+    previous_7_days = daily_emissions.iloc[-14:-7]["CO2_Emissions"]
+
+    last_7_avg = last_7_days.mean()
+    previous_7_avg = previous_7_days.mean()
+
+    if previous_7_avg > 0:
+        percentage_increase = ((last_7_avg - previous_7_avg) / previous_7_avg) * 100
+    else:
+        percentage_increase = 100 if last_7_avg > 0 else 0 
+
+    fig_guage_week = go.Figure(go.Indicator(
+        mode="gauge+number",  # Removing delta mode to avoid potential unwanted dash
+        value=percentage_increase,
+        title={'text': "Percentage Change in CO2 Emissions (Last Week vs Previous Week)"},
+        gauge={
+            'axis': {'range': [-100, 100]},  # Range from -100% to 100%
+            'bar': {'color': "darkblue"},    # Bar color
+            'steps': [
+                {'range': [-100, 0], 'color': "#78c6a3"},   # Good: light green
+                {'range': [0, 10], 'color': "#a8e1c6"},     # Blend to a lighter green
+                {'range': [10, 20], 'color': "white"},       # Neutral: white
+                {'range': [20, 30], 'color': "#f6e6e6"},     # Blend to a light pink
+                {'range': [30, 100], 'color': "red"}         # Bad: red
+            ],
+            'threshold': {
+                'line': {'color': "black", 'width': 4},  # Pointer line color and width
+                'thickness': 0.75,
+                'value': percentage_increase,  # Position of the pointer
+            },
+        },
+        number={'valueformat': ".2f", 'suffix': "%", 'font': {'size': 100}},
+        domain={
+            'x': [0, 1],  # Horizontal position of the gauge (from 0 to 1, meaning left to right)
+            'y': [0, 1]  # Lower the value
+        }
+        
+    ))
+
+    fig_guage_week.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
+        plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot background
+    )
 
     fig_guage_day_html = fig_guage_day.to_html(full_html=False, include_plotlyjs='cdn')
     fig_guage_week_html = fig_guage_week.to_html(full_html=False, include_plotlyjs='cdn')
-    fig_guage_day_emissison_html = last_day_emissions.to_html(full_html=False, include_plotlyjs='cdn')
 
     return jsonify({'visualisation_guage_day_html': fig_guage_day_html},
                    {'visualisation_guage_week_html': fig_guage_week_html},
-                   {'visualisation_day_emission': fig_guage_day_emissison_html})
+                   {'visualisation_day_emission': last_day_emissions})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=3001)
