@@ -76,6 +76,11 @@ def generate_style_visualisation():
     return jsonify({'visualisation_html': fig2_html})
 
 
+@app.route("/generate-table-visualisation", methods=["POST"])
+def generate_style_visualisation():
+
+
+
 @app.route("/generate-gauge-visualisation", methods=["POST"])
 def generate_style_visualisation():
 
