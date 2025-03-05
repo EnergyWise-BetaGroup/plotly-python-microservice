@@ -20,7 +20,7 @@ services:
   energy-python:
     image: erikrasniqi/energy-python:latest
     ports:
-      - "3001:3001"
+      - "3014:3014"
     restart: always
     networks:
       - energy-network
