@@ -191,8 +191,9 @@ def generate_gauge_style_visualisation():
  
     # Convert the meter data to a DataFrame
     meter_data = data_dict["data"]["meter"]
-
     df_meter = pd.DataFrame(meter_data)
+
+    intensity_data = data_dict["data"]["intensity"]
     df_intensity = pd.DataFrame(intensity_data)
     print("df_intensity")
     print(df_intensity)
@@ -205,8 +206,12 @@ def generate_gauge_style_visualisation():
     df_meter['CO2_Emissions'] = df_meter['datapoint'] * df_intensity['datapoint']
     print(df_meter)
 
-
+    df = df_meter
     print(df)
+
+    df['Datetime (UTC)'] = pd.to_datetime(df['start_datetime'])
+
+    df['Date'] = df['Datetime (UTC)'].dt.date
  
     # Sum the emissions for each day
     daily_emissions = df.groupby('Date')['CO2_Emissions'].sum().reset_index()
@@ -305,8 +310,11 @@ def generate_gauge_style_visualisation():
         plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot background
     )
  
-    fig_guage_day_html = fig_guage_day.to_html(full_html=False, include_plotlyjs='cdn')
+    fig_guage_day_html = fig_guage_day.to_html(full_html=False, config={"responsive": True})
     fig_guage_week_html = fig_guage_week.to_html(full_html=False, include_plotlyjs='cdn')
+
+    # To try fig_guage_day.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
+    # Also do we need the include plotlyjs thing?
 
     return jsonify({
         'visualisation_guage_day_html': fig_guage_day_html,
