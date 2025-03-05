@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   energy-mvc:
-    image: giorgia825/energy-mvc:latest
+    image: allredmatt/energy-mvc:latest
     ports:
       - "3000:3000"
     restart: always
