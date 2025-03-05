@@ -1,7 +1,11 @@
 version: "3.9"
 services:
   energy-mvc:
+<<<<<<< HEAD
     image: erikrasniqi/energy-mvc:latest
+=======
+    image: allredmatt/energy-mvc:latest
+>>>>>>> fcb0bab4d63dafc3dd8bf2ffa08d3ba18b7312ec
     ports:
       - "3000:3000"
     restart: always
