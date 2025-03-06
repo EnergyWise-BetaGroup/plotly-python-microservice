@@ -98,9 +98,11 @@ def generate_table_visualisation():
 
     new_df['start'] = pd.to_datetime(new_df['start'])
 
-    new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean()
+    new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean().reset_index()
 
     new_df['start'] = new_df['start'].dt.strftime("%H:%M")
+
+    new_df.set_index('start', inplace=True)
     
     new_df = new_df.iloc[0:12, :]
 
