@@ -92,17 +92,7 @@ def generate_table_visualisation():
 
     df = pd.DataFrame(data)
 
-    # df= df_input[['start']]  # DataFrame with just 'start' column
-    # df_intensity = df_input[['intensity']]
-
-    # df = pd.DataFrame(start)
-    # df_intensity = pd.DataFrame(intensity)
-
-    # df['intensity'] = df_intensity['intensity']
-
     new_df = df.copy()
-
-
 
     new_df['intensity'] = new_df['intensity'].astype(int)
 
@@ -110,7 +100,7 @@ def generate_table_visualisation():
 
     new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean()
 
-    new_df['Datetime (UTC)'] = new_df['Datetime (UTC)'].dt.strftime("%H:%M")
+    new_df['start'] = new_df['start'].dt.strftime("%H:%M")
     
     new_df = new_df.iloc[0:12, :]
 

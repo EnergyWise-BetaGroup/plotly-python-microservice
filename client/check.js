@@ -5,7 +5,7 @@ const donutMountPoint = document.getElementById("donut-mount-point")
 const tableMountPoint = document.getElementById("table-mount-point")
  
 // const token = localStorage.getItem("token");
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpc3RyYXRpb25faWQiOjEsImlhdCI6MTc0MTE4MzYzNywiZXhwIjoxNzQxMTg3MjM3fQ.gBR89abnPthvWCoRgI_MHE46aclnFeVUclb30l0aNjw"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpc3RyYXRpb25faWQiOjEsImlhdCI6MTc0MTI4Mzk0MCwiZXhwIjoxNzQxMjg3NTQwfQ.848gDbnFdpovQ5glIePrqWE_wAIXNu6EtTuTc36F1iU"
 async function fetchChart(chart ,mountPoint){
     options = {
         headers: {authorization: token}
