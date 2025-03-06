@@ -102,9 +102,15 @@ def generate_table_visualisation():
 
     new_df = df.copy()
 
+
+
+    new_df['intensity'] = new_df['intensity'].astype(int)
+
     new_df['start'] = pd.to_datetime(new_df['start'])
 
     new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean()
+
+    new_df['Datetime (UTC)'] = new_df['Datetime (UTC)'].dt.strftime("%H:%M")
     
     new_df = new_df.iloc[0:12, :]
 
@@ -128,11 +134,11 @@ def generate_table_visualisation():
 
     def color(a):
         if a > threshold66.iloc[0]:
-            return [a, red]
+            return red
         elif a > threshold33.iloc[0]:
-            return [a, amber]
+            return amber
         else:
-            return [a, green]
+            return green
 
     x = list(map(color, new_df_values))
 
@@ -141,48 +147,48 @@ def generate_table_visualisation():
         y = 0
 
         while y < len(x) - 1: 
-            if x[y][1] == "🟩" and x[y + 1][1] == "🟩":
+            if x[y] == "🟩" and x[y + 1] == "🟩":
                 list_app.append("🚙 🧺")
-            elif x[y][1] == "🟩":
+            elif x[y] == "🟩": 
                 list_app.append("🧺")
             else:
                 list_app.append("") 
             y += 1
 
-        if x[len(x)-1][1] == "🟥":
+        if x[len(x)-1] == "🟥":
             list_app.append("")
-        elif x[len(x)-1][1] == "🟨":
+        elif x[len(x)-1] == "🟨":
             list_app.append("")
-        elif x[len(x)-1][1] == "🟩" and x[len(x)-2][1] == "🟩":
-            list_app.append("🧺")
-        elif x[len(x)-1][1] == "🟩":
+        elif x[len(x)-1] == "🟩" and x[len(x)-2] == "🟩":
+            list_app.append("🚙🧺")
+        elif x[len(x)-1] == "🟩":
             list_app.append("🧺")
         return list_app
 
     emojis = appliance(x)
 
-    table_values = [[emojis[i], x[i][0], x[i][1]] for i in range(len(x))]
-
 
     fig3 = go.Figure(data=[go.Table(
-                columnwidth = [1000],
-                header=dict(values=new_df_columns,
+                columnwidth = [10,10,10,10,10,10,10,10,10,10,10,10],
+                header=dict(values=['Datetime', 'CO2 Intensity', 'Intensity Level', 'Suggestion'],
                         line_color='white',
                         fill_color='rgb(1, 102, 102)',
                         align=['center'],
                         font=dict(color='white', size=12),
                         height=70),
-                    cells=dict(values=table_values,
+                    cells=dict(values=[new_df_columns, new_df_values, x, emojis],
                         line_color='white',
                         fill=dict(color=['rgb(221, 252, 233)', 'white','rgb(221, 252, 233)', 'white',
                                         'rgb(221, 252, 233)', 'white','rgb(221, 252, 233)', 'white',
                                         'rgb(221, 252, 233)', 'white','rgb(221, 252, 233)', 'white']),
                         align=['center'],
-                        font_size=30,
+                        font_size=12,
                         height=100))
                         ])
 
-    fig3_html = fig3.to_html(full_html=False, include_plotlyjs='cdn')
+    fig3.update_layout(margin=dict(l=20, r=20, t=20, b=20), width=365, height=1000)
+
+    fig3_html = fig3.to_html(full_html=False)
 
     return jsonify({'visualisation_html': fig3_html})
 
