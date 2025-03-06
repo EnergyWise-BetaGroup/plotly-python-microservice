@@ -81,6 +81,7 @@ def generate_style_visualisation():
 
     return jsonify({'visualisation_html': fig2_html})
 
+
 @app.route("/generate-table-visualisation", methods=["POST"])
 def generate_table_visualisation():
 
@@ -91,27 +92,15 @@ def generate_table_visualisation():
 
     df = pd.DataFrame(data)
 
-    # df= df_input[['start']]  # DataFrame with just 'start' column
-    # df_intensity = df_input[['intensity']]
-
-    # df = pd.DataFrame(start)
-    # df_intensity = pd.DataFrame(intensity)
-
-    # df['intensity'] = df_intensity['intensity']
-
     new_df = df.copy()
-
-
 
     new_df['intensity'] = new_df['intensity'].astype(int)
 
     new_df['start'] = pd.to_datetime(new_df['start'])
 
-    new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean().reset_index()
+    new_df = new_df.groupby(pd.Grouper(key="start", freq="2h")).mean()
 
     new_df['start'] = new_df['start'].dt.strftime("%H:%M")
-
-    new_df.set_index('start', inplace=True)
     
     new_df = new_df.iloc[0:12, :]
 
@@ -184,21 +173,17 @@ def generate_table_visualisation():
                                         'rgb(221, 252, 233)', 'white','rgb(221, 252, 233)', 'white']),
                         align=['center'],
                         font_size=12,
-                        height=40))
+                        height=100))
                         ])
 
-    fig3.update_layout(
-        margin=dict(l=20, r=20, t=20, b=20), 
-        width=365, 
-        height=1000,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        )
-
+    fig3.update_layout(margin=dict(l=20, r=20, t=20, b=20), width=365, height=1000)
 
     fig3_html = fig3.to_html(full_html=False)
 
     return jsonify({'visualisation_html': fig3_html})
+
+
+
 
 @app.route("/generate-gauge-visualisation", methods=["POST"])
 def generate_gauge_style_visualisation():
