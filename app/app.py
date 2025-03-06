@@ -83,13 +83,20 @@ def generate_table_visualisation():
 
     data = request.json
 
-    start = data['data']['start']
-    intensity = data['data']['intensity']
+    df_co2['Datetime (UTC)'] = df_co2['Datetime (UTC)'].str.replace(r'Z', '', regex=True)
+
+
+    start = data['start']
+    intensity = data['intensity']
 
     df = pd.DataFrame(start)
     df_intensity = pd.DataFrame(intensity)
 
     df['intensity'] = df_intensity['intensity']
+
+    df['intensity'] = df['intensity'].str.replace(r'T', ' ', regex=True)
+
+
 
     new_df = df.copy()
 
@@ -130,7 +137,7 @@ def generate_table_visualisation():
         while y < len(x) - 1: 
             if x[y][1] == "🟩" and x[y + 1][1] == "🟩":
                 list_app.append("🚙 🧺")
-            elif x[y][1] == "🟩" or x[y + 1][1] == "🟩":
+            elif x[y][1] == "🟩":
                 list_app.append("🧺")
             else:
                 list_app.append("") 
