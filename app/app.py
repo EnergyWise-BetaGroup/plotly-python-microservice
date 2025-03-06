@@ -187,6 +187,10 @@ def generate_table_visualisation():
 
 @app.route("/generate-gauge-visualisation", methods=["POST"])
 def generate_gauge_style_visualisation():
+
+    chart_width = 350
+    chart_height = 250
+
     data_dict = request.json
  
     # Convert the meter data to a DataFrame
@@ -234,9 +238,8 @@ def generate_gauge_style_visualisation():
     print(percentage_increase)
  
     fig_guage_day = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
+        mode="gauge+number",
         value=percentage_increase,
-        title={'text': "Percentage Change in CO2 Emissions (Last Week vs Previous Week)"},
         gauge={
             'axis': {'range': [-100, 100]},  # Range from -100% to 100%
             'bar': {'color': "darkblue"},
@@ -260,7 +263,10 @@ def generate_gauge_style_visualisation():
  
     fig_guage_day.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            plot_bgcolor='rgba(0,0,0,0)',
+            width=chart_width,
+            height=chart_height,
+            font=dict(size=8)
     )
 
  
@@ -278,7 +284,6 @@ def generate_gauge_style_visualisation():
     fig_guage_week = go.Figure(go.Indicator(
         mode="gauge+number",  # Removing delta mode to avoid potential unwanted dash
         value=percentage_increase,
-        title={'text': "Percentage Change in CO2 Emissions (Last Week vs Previous Week)"},
         gauge={
             'axis': {'range': [-100, 100]},  # Range from -100% to 100%
             'bar': {'color': "darkblue"},    # Bar color
@@ -295,11 +300,7 @@ def generate_gauge_style_visualisation():
                 'value': percentage_increase,  # Position of the pointer
             },
         },
-        number={'valueformat': ".2f", 'suffix': "%", 'font': {'size': 100}},
-        domain={
-            'x': [0, 1],  # Horizontal position of the gauge (from 0 to 1, meaning left to right)
-            'y': [0, 1]  # Lower the value
-        }
+        number={'valueformat': ".0f", 'suffix': "%"},
        
     ))
 
@@ -308,10 +309,13 @@ def generate_gauge_style_visualisation():
     fig_guage_week.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
         plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot background
+        width=chart_width,
+        height=chart_height,
+        font=dict(size=8)
     )
  
-    fig_guage_day_html = fig_guage_day.to_html(full_html=False, config={"responsive": True})
-    fig_guage_week_html = fig_guage_week.to_html(full_html=False, include_plotlyjs='cdn')
+    fig_guage_day_html = fig_guage_day.to_html(config={'displayModeBar': False}, full_html=False)
+    fig_guage_week_html = fig_guage_week.to_html(config={'displayModeBar': False}, full_html=False)
 
     # To try fig_guage_day.to_html(full_html=False, include_plotlyjs='cdn', config={"responsive": True})
     # Also do we need the include plotlyjs thing?
