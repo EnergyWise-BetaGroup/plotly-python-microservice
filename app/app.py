@@ -41,7 +41,7 @@ def generate_visualisation():
     )
 
 
-    fig_html = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    fig_html = fig.to_html(full_html=False)
 
     return jsonify({'visualisation_html': fig_html})
 
@@ -71,9 +71,13 @@ def generate_style_visualisation():
 
     fig2.update_traces(hole=.4)
 
-    fig2.update_layout(legend=dict(y=1.4, orientation='h'))
+    fig2.update_layout(
+        width=400,
+        height=450,
+        legend=dict(yanchor='top', orientation='h', xanchor='left', y=-0.25)
+        )
 
-    fig2_html = fig2.to_html(full_html=False, include_plotlyjs='cdn')
+    fig2_html = fig2.to_html(full_html=False)
 
     return jsonify({'visualisation_html': fig2_html})
 
